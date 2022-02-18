@@ -1,11 +1,26 @@
-import type { NextPage } from "next";
+import type { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Banner from "components/banner";
-import NavBar from "components/navbar/NavBar";
+import NavBar from "components/navbar";
+import Card from "components/card";
+import SectionList from "components/section-list";
+import { getVideos } from "services/youtubeService";
+import { VideoProps } from "types/videoTypes";
 
-const Home: NextPage = () => {
+interface HomeProps {
+  disneyVideos: VideoProps[];
+  travelVideos: VideoProps[];
+  productivityVideos: VideoProps[];
+  popularVideos: VideoProps[];
+}
+const Home: NextPage<HomeProps> = ({
+  disneyVideos,
+  travelVideos,
+  productivityVideos,
+  popularVideos,
+}) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -22,9 +37,33 @@ const Home: NextPage = () => {
           subTitle="The blue squad"
           imgUrl="/static/smurfs2.jpg"
         />
+
+        <SectionList title="Disney" videos={disneyVideos} size="large" />
+        <SectionList title="Travel" videos={travelVideos} size="small" />
+        <SectionList
+          title="Productivity"
+          videos={productivityVideos}
+          size="medium"
+        />
+        <SectionList title="Popular" videos={popularVideos} size="small" />
       </main>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const videos = await getVideos("disney trailers");
+  const [disneyVideos, travelVideos, productivityVideos, popularVideos] =
+    await Promise.all([
+      getVideos("disney trailers"),
+      getVideos("travel"),
+      getVideos("productivity"),
+      getVideos("popular"),
+    ]);
+
+  return {
+    props: { disneyVideos, travelVideos, productivityVideos, popularVideos },
+  };
 };
 
 export default Home;
