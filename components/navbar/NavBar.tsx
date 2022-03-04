@@ -1,16 +1,39 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { magic } from "lib/magicService";
 import styles from "./navbar.module.css";
+import { useRouter } from "next/router";
 
-interface NavBarProps {
-  username: string;
-}
-
-const NavBar = ({ username }: NavBarProps) => {
+const NavBar = () => {
+  const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const userEmail = localStorage.getItem("email");
+
+    if (userEmail) {
+      setEmail(userEmail);
+    }
+  }, [email]);
+
   const toggleDropdown = () => {
     setShowDropdown((drop) => !drop);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      if (!magic) return;
+
+      await magic.user.logout();
+      localStorage.removeItem("email");
+    } catch (err) {
+      console.log(err);
+    } finally {
+      router.push("/login");
+    }
   };
 
   return (
@@ -37,7 +60,7 @@ const NavBar = ({ username }: NavBarProps) => {
         <nav className={styles.navContainer}>
           <div>
             <button className={styles.usernameBtn} onClick={toggleDropdown}>
-              <p className={styles.username}>{username}</p>
+              <p className={styles.username}>{email}</p>
               <Image
                 src="/static/expand_more.svg"
                 width={24}
@@ -49,7 +72,9 @@ const NavBar = ({ username }: NavBarProps) => {
               <div className={styles.navDropdown}>
                 <div>
                   <Link href="/login">
-                    <a className={styles.linkName}>Sign out</a>
+                    <a onClick={handleSignOut} className={styles.linkName}>
+                      Sign out
+                    </a>
                   </Link>
                   <div className={styles.lineWrapper}></div>
                 </div>

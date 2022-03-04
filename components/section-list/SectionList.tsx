@@ -1,10 +1,11 @@
 import Card from "components/card";
-import { VideoProps } from "types/videoTypes";
+import Link from "next/link";
+import { MoviesProps } from "types/videoTypes";
 import styles from "./section-list.module.css";
 
 interface SectionListProps {
   title: string;
-  videos: VideoProps[];
+  videos: MoviesProps[];
   size?: "large" | "medium" | "small";
 }
 
@@ -13,8 +14,17 @@ const SectionList = ({ title, videos, size }: SectionListProps) => {
     <section className={styles.container}>
       <h2 className={styles.title}>{title}</h2>
       <div className={styles.cardWrapper}>
-        {videos.map((video) => (
-          <Card key={video.id} size={size} imgUrl={video.imgUrl} />
+        {videos.map((video, i) => (
+          <Link href={`video/${video.id}`} key={video.id}>
+            <a>
+              <Card
+                size={size}
+                imgUrl={video.imgUrl}
+                last={i === videos.length - 1}
+                first={i === 0}
+              />
+            </a>
+          </Link>
         ))}
       </div>
     </section>

@@ -7,6 +7,8 @@ import styles from "./card.module.css";
 interface CardProps {
   imgUrl?: string;
   size?: keyof Size;
+  first: boolean;
+  last: boolean;
 }
 
 interface Size {
@@ -18,7 +20,12 @@ interface Size {
 const defaultImg =
   "https://images.unsplash.com/photo-1542204165-65bf26472b9b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1548&q=80";
 
-const Card = ({ imgUrl = defaultImg, size = "medium" }: CardProps) => {
+const Card = ({
+  imgUrl = defaultImg,
+  size = "medium",
+  first,
+  last,
+}: CardProps) => {
   const [imgSrc, setImgSrc] = useState(imgUrl);
 
   let key: keyof Size;
@@ -36,7 +43,7 @@ const Card = ({ imgUrl = defaultImg, size = "medium" }: CardProps) => {
     <div className={styles.container}>
       <motion.div
         className={cls(styles.imgMotionWrapper, classes[size])}
-        whileHover={{ scale: 1.1, left: -12 }}
+        whileHover={{ scale: 1.1, left: first ? 15 : last ? -15 : -12 }}
       >
         <Image
           src={imgSrc}

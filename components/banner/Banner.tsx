@@ -1,15 +1,19 @@
 import Image from "next/image";
+import { useRouter } from "next/router";
 import styles from "./banner.module.css";
 
 interface BannerProps {
   title: string;
   subTitle: string;
   imgUrl: string;
+  id: number;
 }
 
-const Banner = ({ title, subTitle, imgUrl }: BannerProps) => {
+const Banner = ({ title, subTitle, imgUrl, id }: BannerProps) => {
+  const router = useRouter();
+
   const handlePlay = () => {
-    console.log("Play");
+    router.push(`/video/${id}`);
   };
 
   return (
@@ -44,6 +48,8 @@ const Banner = ({ title, subTitle, imgUrl }: BannerProps) => {
           position: "absolute",
           backgroundSize: "cover",
           backgroundPosition: "50% 50%",
+          backgroundRepeat: "no-repeat",
+          objectFit: "cover",
         }}
       ></div>
     </div>

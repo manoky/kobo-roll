@@ -19,8 +19,9 @@
       "components/*": ["components/*"],
       "styles/*": ["styles/*"],
       "types/*": ["types/*"],
-      "services/*": ["services/*"],
-      "constants/*": ["constants/*"]
+      "lib/*": ["lib/*"],
+      "constants/*": ["constants/*"],
+      "graphql/*": ["graphql/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

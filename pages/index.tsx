@@ -1,25 +1,23 @@
 import type { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Banner from "components/banner";
 import NavBar from "components/navbar";
-import Card from "components/card";
 import SectionList from "components/section-list";
-import { getVideos } from "services/youtubeService";
-import { VideoProps } from "types/videoTypes";
+import { getMovies } from "lib/videoService";
+import { MoviesProps } from "types/videoTypes";
 
 interface HomeProps {
-  disneyVideos: VideoProps[];
-  travelVideos: VideoProps[];
-  productivityVideos: VideoProps[];
-  popularVideos: VideoProps[];
+  adventureVideos: MoviesProps[];
+  animationVideos: MoviesProps[];
+  documentaryVideos: MoviesProps[];
+  actionVideos: MoviesProps[];
 }
 const Home: NextPage<HomeProps> = ({
-  disneyVideos,
-  travelVideos,
-  productivityVideos,
-  popularVideos,
+  adventureVideos,
+  animationVideos,
+  documentaryVideos,
+  actionVideos,
 }) => {
   return (
     <div className={styles.container}>
@@ -30,39 +28,44 @@ const Home: NextPage<HomeProps> = ({
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>Kobo-roll</h1>
-        <NavBar username="user@example.com" />
+        {/* <h1 className={styles.title}>Kobo-roll</h1> */}
+        <NavBar />
         <Banner
-          title="The Smurfs"
-          subTitle="The blue squad"
-          imgUrl="/static/smurfs2.jpg"
+          id={568124}
+          title="Encanto"
+          subTitle="The tale of an extraordinary family"
+          imgUrl="https://image.tmdb.org/t/p/original/3G1Q5xF40HkUBJXxt2DQgQzKTp5.jpg"
         />
 
-        <SectionList title="Disney" videos={disneyVideos} size="large" />
-        <SectionList title="Travel" videos={travelVideos} size="small" />
+        <SectionList title="Adventure" videos={adventureVideos} size="large" />
+        <SectionList title="Animation" videos={animationVideos} size="small" />
         <SectionList
-          title="Productivity"
-          videos={productivityVideos}
+          title="Documentary"
+          videos={documentaryVideos}
           size="medium"
         />
-        <SectionList title="Popular" videos={popularVideos} size="small" />
+        <SectionList title="Action" videos={actionVideos} size="small" />
       </main>
     </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const videos = await getVideos("disney trailers");
-  const [disneyVideos, travelVideos, productivityVideos, popularVideos] =
+  const [adventureVideos, animationVideos, documentaryVideos, actionVideos] =
     await Promise.all([
-      getVideos("disney trailers"),
-      getVideos("travel"),
-      getVideos("productivity"),
-      getVideos("popular"),
+      getMovies("12"),
+      getMovies("16"),
+      getMovies("99"),
+      getMovies("28"),
     ]);
 
   return {
-    props: { disneyVideos, travelVideos, productivityVideos, popularVideos },
+    props: {
+      adventureVideos,
+      animationVideos,
+      documentaryVideos,
+      actionVideos,
+    },
   };
 };
 

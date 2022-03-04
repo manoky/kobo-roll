@@ -1,29 +1,47 @@
-type ThumbnailsProps = {
-  high: {
-    url: string;
-  };
-};
-
-type SnippetProps = {
-  title: string;
-  thumbnails: ThumbnailsProps;
-};
-
 type ItemProps = {
-  id: {
-    videoId: string;
-  };
-  snippet: SnippetProps;
+  poster_path: string;
+  title: string;
+  id: number;
 };
 
-interface ResponseVideoProps {
-  items: ItemProps[];
+type Video = {
+  iso_639_1: string;
+  iso_3166_1: string;
+  name: string;
+  key: string;
+  published_at: string;
+  site: string;
+  size: number;
+  type: string;
+  official: boolean;
+  id: string;
+};
+interface ResponseMovieProps {
+  results: ItemProps[];
 }
 
-interface VideoProps {
+interface Genre {
+  id: number;
+  name: string;
+}
+
+interface MoviesProps {
   title: string;
-  id: string;
+  id: number;
   imgUrl: string;
 }
 
-export type { ResponseVideoProps, VideoProps };
+interface MovieProps {
+  backdrop_path: string;
+  id: number;
+  genres: Genre[];
+  title: string;
+  overview: string;
+  tagline: string;
+  release_date: string;
+  videos: {
+    results: Video[];
+  };
+}
+
+export type { ResponseMovieProps, MoviesProps, MovieProps };
