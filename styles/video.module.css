@@ -1,5 +1,5 @@
 .modal {
-  position: absolute;
+  position: relative;
   /** centers modal **/
   left: 0;
   right: 0;
@@ -8,11 +8,12 @@
   width: 800px;
   bottom: 40px;
   background-color: var(--black40);
-  top: 10%;
+  top: 50px;
 
   outline: none;
   border-radius: 10px;
   border: 1px solid var(--shadow10);
+
 }
 
 .overlay {
@@ -43,6 +44,7 @@
 /** Modal body **/
 .modalBody {
   padding: 0 3rem;
+    position: relative;
 }
 
 .modalBodyContent {
@@ -105,7 +107,7 @@
 
 @media (min-width: 1024px) {
   .modal {
-    top: 10%;
+    top: 100px;
     bottom: 40px;
     width: 50%;
   }

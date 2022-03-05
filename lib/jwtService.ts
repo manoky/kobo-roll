@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { MagicUserMetadata } from "@magic-sdk/admin";
 
 const createToken = (metadata: MagicUserMetadata) => {
@@ -19,7 +19,7 @@ const createToken = (metadata: MagicUserMetadata) => {
   return token;
 };
 
-const verifyToken = (token: string) => {
+const verifyToken = (token: string)  => {
   const decode = jwt.verify(token, process.env.JWT_SECRET || "");
 
   return decode;

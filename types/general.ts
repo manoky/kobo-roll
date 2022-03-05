@@ -8,4 +8,14 @@ interface IconProps extends React.SVGProps<SVGAElement> {
   selected?: boolean;
 }
 
-export type { UserType, IconProps };
+interface VideoQueryType {
+  userId: string;
+  videoId: number;
+}
+
+interface UpdateParamsType extends VideoQueryType {
+  favourited?: number;
+  watched?: boolean;
+}
+
+export type { UserType, IconProps, VideoQueryType, UpdateParamsType };

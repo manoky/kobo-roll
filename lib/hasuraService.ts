@@ -1,13 +1,9 @@
 import { GRAPHQL_URL } from "constants/routes";
-import { getStats, getUsers, getUser } from "graphql/queries";
-import { createUser } from "graphql/mutation";
-import { UserType } from "types/general";
+import { getUsers, getUser, getStatsByUserId } from "graphql/queries";
+import { createUser, insertUserStats, updateUserStats } from "graphql/mutation";
+import { UserType, VideoQueryType, UpdateParamsType } from "types/general";
 
-async function fetchGraphQL<Type>(
-  operationsDoc: string,
-  token: string,
-  variables: Type
-) {
+async function fetchGraphQL<Type>(operationsDoc: string, token: string, variables: Type) {
   const result = await fetch(GRAPHQL_URL, {
     method: "POST",
     headers: {
@@ -37,17 +33,7 @@ const fetchUser = async (issuer: string, token: string) => {
 };
 
 const createNewUser = async (user: UserType, token: string) => {
-  const { errors, data } = await fetchGraphQL<UserType>(
-    createUser,
-    token,
-    user
-  );
-
-  return { errors, stats: data?.stats };
-};
-
-const fetchStats = async (token: string) => {
-  const { errors, data } = await fetchGraphQL(getStats, token, {});
+  const { errors, data } = await fetchGraphQL<UserType>(createUser, token, user);
 
   return { errors, stats: data?.stats };
 };
@@ -64,4 +50,28 @@ const loginUser = async (token: string) => {
   return await res.json();
 };
 
-export { fetchStats, fetchUsers, fetchUser, createNewUser, loginUser };
+const fetchUserStats = async (videoQueryVariables: VideoQueryType, token: string) => {
+  const { errors, data } = await fetchGraphQL(
+    getStatsByUserId,
+    token,
+    videoQueryVariables
+  );
+
+  return { errors, stats: data?.stats.length > 0 };
+};
+
+const updateStats = async (params: UpdateParamsType, token: string) => {
+  const { userId, videoId, ...rest } = params;
+  const { stats } = await fetchUserStats({ userId, videoId }, token);
+
+  if (stats) {
+    const { errors, data } = await fetchGraphQL(updateUserStats, token, rest);
+
+    return { errors, stats: data?.stats };
+  } else {
+    const { errors, data } = await fetchGraphQL(insertUserStats, token, rest);
+    return { errors, stats: data?.stats };
+  }
+};
+
+export { fetchUsers, fetchUser, createNewUser, loginUser, fetchUserStats, updateStats };

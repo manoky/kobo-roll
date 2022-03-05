@@ -24,6 +24,7 @@ const Login: NextPage = () => {
           await magic.user.getMetadata();
 
         localStorage.setItem("email", userEmail ?? "");
+        localStorage.setItem("didToken", didToken ?? "");
 
         // console.log({ userToken });
         const resp = await loginUser(didToken ?? "");

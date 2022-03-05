@@ -7,18 +7,6 @@ const getUsers = `
     }
 `;
 
-const getStats = `
-    query GetUsers {
-        stats {
-            favourited
-            id
-            userId
-            videoId
-            watched
-        }
-    }
-`;
-
 const getUser = `
     query GetUser($issuer: String!) {
         users(where: {issuer: {_eq: $issuer}}) {
@@ -29,4 +17,16 @@ const getUser = `
     }
 `;
 
-export { getStats, getUsers, getUser };
+const getStatsByUserId = `
+  query GetVideoStatsByUserId($userId: String!, $videoId: Int!) {
+    stats(where: {userId: {_eq: $userId}, videoId: {_eq: $videoId}}) {
+      userId
+      videoId
+      id
+      watched
+      favourited
+    }
+  }
+`;
+
+export { getUsers, getUser, getStatsByUserId };

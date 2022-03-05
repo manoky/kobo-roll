@@ -16,6 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // await magic.token.validate(didToken);
       const metadata = await magic.users.getMetadataByToken(didToken);
       const token = createToken(metadata);
+      console.log(token);
 
       const { issuer, publicAddress } = metadata;
 
