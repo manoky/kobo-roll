@@ -6,18 +6,22 @@ import NavBar from "components/navbar";
 import SectionList from "components/section-list";
 import { getMovies } from "lib/videoService";
 import { MoviesProps } from "types/videoTypes";
+import { fetchWatchedVideos } from "lib/hasuraService";
+import { verifyToken } from "lib/jwtService";
 
 interface HomeProps {
   adventureVideos: MoviesProps[];
   animationVideos: MoviesProps[];
   documentaryVideos: MoviesProps[];
   actionVideos: MoviesProps[];
+  watchAgain: MoviesProps[];
 }
 const Home: NextPage<HomeProps> = ({
   adventureVideos,
   animationVideos,
   documentaryVideos,
   actionVideos,
+  watchAgain,
 }) => {
   return (
     <div className={styles.container}>
@@ -38,19 +42,33 @@ const Home: NextPage<HomeProps> = ({
         />
 
         <SectionList title="Adventure" videos={adventureVideos} size="large" />
+        {watchAgain.length > 0 && (
+          <SectionList title="Watch Again" videos={watchAgain} size="small" />
+        )}
         <SectionList title="Animation" videos={animationVideos} size="small" />
-        <SectionList
-          title="Documentary"
-          videos={documentaryVideos}
-          size="medium"
-        />
+        <SectionList title="Documentary" videos={documentaryVideos} size="medium" />
         <SectionList title="Action" videos={actionVideos} size="small" />
       </main>
     </div>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const { token } = req.cookies;
+  const auth = verifyToken(token);
+
+  if (!auth) {
+    return {
+      props: {},
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  const { stats } = await fetchWatchedVideos(auth.userId, token);
+
   const [adventureVideos, animationVideos, documentaryVideos, actionVideos] =
     await Promise.all([
       getMovies("12"),
@@ -65,6 +83,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       animationVideos,
       documentaryVideos,
       actionVideos,
+      watchAgain: stats,
     },
   };
 };

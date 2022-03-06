@@ -1,54 +1,87 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Modal from "react-modal";
 import styles from "styles/video.module.css";
 import { getMovie, getMovies } from "lib/videoService";
 import { MovieProps } from "types/videoTypes";
-import { VIDEO_URL } from "constants/routes";
+import { IMG_URL, VIDEO_URL } from "constants/routes";
 import cls from "classnames";
 import NavBar from "components/navbar";
 import { Like, Dislike } from "components/icons";
+import { updateFavourite, getMoviestats } from "lib/generalService";
 
 const Video: NextPage<{ movie: MovieProps }> = ({ movie: initialMovie }) => {
   const router = useRouter();
   const { id } = router.query;
+  const videoId = Number(id);
   const [movie, setMovie] = useState<MovieProps | null>(initialMovie);
   const [liked, setLiked] = useState(false);
   const [disLiked, setDisliked] = useState(false);
 
   useEffect(() => {
+    const fetchStats = async () => {
+      const stats = await getMoviestats(videoId);
+      if (stats) {
+        if (stats.favourited === 1) {
+          setLiked(true);
+        } else if (stats.favourited === 2) {
+          setDisliked(true);
+        }
+      }
+    };
+
+    fetchStats();
+  }, [videoId]);
+
+  useEffect(() => {
     const fetchMovie = async () => {
-      const data = await getMovie(id as string);
+      const data = await getMovie(videoId);
 
       if (data) {
         setMovie(data);
       }
     };
-    if (movie) {
+
+    if (!movie) {
       fetchMovie();
     }
-  }, [id, movie]);
+  }, [videoId, movie]);
 
   if (!movie) {
     return null;
   }
 
-  const toggleLike = () => {
+  const updateData = {
+    watched: true,
+    videoId: Number(id),
+    imgUrl: IMG_URL + movie.poster_path,
+  };
+
+  const toggleLike = async () => {
     setLiked((like) => !like);
     if (disLiked) {
       setDisliked(false);
     }
+
+    await updateFavourite({
+      favourited: liked ? 0 : 1,
+      ...updateData,
+    });
   };
-  const toggleDislike = () => {
-    setDisliked((dis) => !dis);
+
+  const toggleDislike = async () => {
+    setDisliked(!disLiked);
     if (liked) {
       setLiked(false);
     }
+
+    await updateFavourite({
+      favourited: disLiked ? 0 : 2,
+      ...updateData,
+    });
   };
 
-  const key =
-    movie.videos.results.length > 0 ? movie.videos.results[0].key : "";
+  const key = movie.videos.results.length > 0 ? movie.videos.results[0].key : "";
   return (
     <div className={styles.container}>
       <NavBar />
@@ -111,7 +144,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const movie = await getMovie(context.params?.id as string);
+  const movie = await getMovie(Number(context.params?.id));
   return { props: { movie }, revalidate: 10 };
 };
 

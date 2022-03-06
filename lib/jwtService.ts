@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { MagicUserMetadata } from "@magic-sdk/admin";
+import { JwtProps } from "types/general";
 
 const createToken = (metadata: MagicUserMetadata) => {
   const token = jwt.sign(
@@ -19,10 +20,20 @@ const createToken = (metadata: MagicUserMetadata) => {
   return token;
 };
 
-const verifyToken = (token: string)  => {
-  const decode = jwt.verify(token, process.env.JWT_SECRET || "");
+const verifyToken = (token: string) => {
+  try {
+    const decode = jwt.verify(token, process.env.JWT_SECRET || "") as JwtProps;
 
-  return decode;
+    if (decode) {
+      return {
+        userId: decode.issuer,
+      };
+    }
+
+    return null;
+  } catch (err) {
+    return null;
+  }
 };
 
 export { createToken, verifyToken };

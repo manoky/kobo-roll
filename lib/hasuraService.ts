@@ -1,7 +1,19 @@
+import { MovieProps } from "types/videoTypes";
 import { GRAPHQL_URL } from "constants/routes";
-import { getUsers, getUser, getStatsByUserId } from "graphql/queries";
+import {
+  getUsers,
+  getUser,
+  getStatsByUserId,
+  getWatchedVideos,
+  getUserList,
+} from "graphql/queries";
 import { createUser, insertUserStats, updateUserStats } from "graphql/mutation";
-import { UserType, VideoQueryType, UpdateParamsType } from "types/general";
+import {
+  UserType,
+  VideoQueryType,
+  UpdateParamsType,
+  FavouriteProps,
+} from "types/general";
 
 async function fetchGraphQL<Type>(operationsDoc: string, token: string, variables: Type) {
   const result = await fetch(GRAPHQL_URL, {
@@ -38,18 +50,6 @@ const createNewUser = async (user: UserType, token: string) => {
   return { errors, stats: data?.stats };
 };
 
-const loginUser = async (token: string) => {
-  const res = await fetch("/api/login", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  return await res.json();
-};
-
 const fetchUserStats = async (videoQueryVariables: VideoQueryType, token: string) => {
   const { errors, data } = await fetchGraphQL(
     getStatsByUserId,
@@ -57,21 +57,60 @@ const fetchUserStats = async (videoQueryVariables: VideoQueryType, token: string
     videoQueryVariables
   );
 
-  return { errors, stats: data?.stats.length > 0 };
+  return { errors, stats: data?.stats };
 };
 
-const updateStats = async (params: UpdateParamsType, token: string) => {
-  const { userId, videoId, ...rest } = params;
+const updateOrInsertStats = async (params: UpdateParamsType, token: string) => {
+  const { userId, videoId } = params;
   const { stats } = await fetchUserStats({ userId, videoId }, token);
 
-  if (stats) {
-    const { errors, data } = await fetchGraphQL(updateUserStats, token, rest);
+  if (stats.length > 0) {
+    const { userId, videoId, watched, favourited } = params;
+    const { errors, data } = await fetchGraphQL(updateUserStats, token, {
+      userId,
+      videoId,
+      watched,
+      favourited,
+    });
 
-    return { errors, stats: data?.stats };
+    return { errors, stats: data?.update_stats?.returning };
   } else {
-    const { errors, data } = await fetchGraphQL(insertUserStats, token, rest);
-    return { errors, stats: data?.stats };
+    const { errors, data } = await fetchGraphQL(insertUserStats, token, params);
+
+    return { errors, stats: data?.insert_stats_one };
   }
 };
 
-export { fetchUsers, fetchUser, createNewUser, loginUser, fetchUserStats, updateStats };
+const fetchWatchedVideos = async (userId: string, token: string) => {
+  const { errors, data } = await fetchGraphQL(getWatchedVideos, token, { userId });
+
+  return {
+    errors,
+    stats: data?.stats.map((movie: FavouriteProps) => ({
+      id: movie.videoId,
+      imgUrl: movie.imgUrl,
+    })),
+  };
+};
+
+const fetchUserList = async (userId: string, token: string) => {
+  const { errors, data } = await fetchGraphQL(getUserList, token, { userId });
+
+  return {
+    errors,
+    stats: data?.stats.map((movie: FavouriteProps) => ({
+      id: movie.videoId,
+      imgUrl: movie.imgUrl,
+    })),
+  };
+};
+
+export {
+  fetchUser,
+  fetchUsers,
+  createNewUser,
+  fetchUserList,
+  fetchUserStats,
+  fetchWatchedVideos,
+  updateOrInsertStats,
+};

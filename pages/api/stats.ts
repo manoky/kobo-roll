@@ -1,20 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { verifyToken } from "lib/jwtService";
-import { fetchUserStats } from "lib/hasuraService";
-import { JwtPayload } from "jsonwebtoken";
-
-interface StatsProps extends JwtPayload {
-  issuer: string;
-  videoId: number;
-  publicAddress: string;
-}
+import { updateOrInsertStats, fetchUserStats } from "lib/hasuraService";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (req.method === "POST") {
-      const videoId = req.query.videoId;
+      const { videoId, watched, favourited, imgUrl } = req.body;
 
-      const authenticated = verifyToken(req.cookies.token) as StatsProps;
+      const authenticated = verifyToken(req.cookies.token);
       if (!authenticated) {
         return res.status(403).end();
       }
@@ -23,11 +16,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(404).json({ message: "videoId not provided" });
       }
 
-      const videoStats = await fetchUserStats(
-        { videoId: Number(videoId), userId: authenticated.issuer },
+      const movieStats = await updateOrInsertStats(
+        { videoId, userId: authenticated.userId, watched, favourited, imgUrl },
         req.cookies.token
       );
-      res.status(200).json({ videoStats });
+      res.status(200).json({ movieStats });
+    }
+
+    if (req.method === "GET") {
+      const { videoId } = req.query;
+
+      const authenticated = verifyToken(req.cookies.token);
+      if (!authenticated) {
+        return res.status(403).json({ message: "user not authenticated" });
+      }
+
+      if (!videoId) {
+        return res.status(404).json({ message: "videoId not provided" });
+      }
+
+      const movieStats = await fetchUserStats(
+        { videoId: Number(videoId), userId: authenticated.userId },
+        req.cookies.token
+      );
+
+      res.status(200).json({ ...movieStats.stats[0] });
     } else {
       res.status(405).json({ message: `method not allowed ${req.method}` });
     }

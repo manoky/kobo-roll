@@ -11,7 +11,7 @@ const getMovies = async (query?: string) => {
     );
 
     if (!res.ok) {
-      console.log(await res.json());
+      throw new Error("error fetching movies");
     }
 
     const data: ResponseMovieProps = await res.json();
@@ -28,7 +28,7 @@ const getMovies = async (query?: string) => {
   }
 };
 
-const getMovie = async (id: string): Promise<MovieProps | null | undefined> => {
+const getMovie = async (id: number): Promise<MovieProps | null | undefined> => {
   try {
     const res = await fetch(
       `${BASE_URL}/movie/${id}?api_key=${FE_API_KEY}&append_to_response=videos`

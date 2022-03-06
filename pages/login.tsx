@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { magic } from "lib/magicService";
 import styles from "styles/Login.module.css";
-import { loginUser } from "lib/hasuraService";
+import { loginUser } from "lib/generalService";
 
 const Login: NextPage = () => {
   const [emailError, setEmailError] = useState("");
@@ -20,13 +20,11 @@ const Login: NextPage = () => {
     if (magic) {
       try {
         const didToken = await magic.auth.loginWithMagicLink({ email });
-        const { email: userEmail, publicAddress } =
-          await magic.user.getMetadata();
+        const { email: userEmail, publicAddress } = await magic.user.getMetadata();
 
         localStorage.setItem("email", userEmail ?? "");
         localStorage.setItem("didToken", didToken ?? "");
 
-        // console.log({ userToken });
         const resp = await loginUser(didToken ?? "");
 
         if (resp.ok) {

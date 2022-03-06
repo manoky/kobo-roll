@@ -4,6 +4,7 @@ import Image from "next/image";
 import { magic } from "lib/magicService";
 import styles from "./navbar.module.css";
 import { useRouter } from "next/router";
+import { logoutUser } from "lib/generalService";
 
 const NavBar = () => {
   const router = useRouter();
@@ -27,12 +28,11 @@ const NavBar = () => {
     try {
       if (!magic) return;
 
-      await magic.user.logout();
       localStorage.removeItem("email");
+      await logoutUser();
+      // router.push("/login");
     } catch (err) {
       console.log(err);
-    } finally {
-      router.push("/login");
     }
   };
 

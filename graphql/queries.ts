@@ -29,4 +29,25 @@ const getStatsByUserId = `
   }
 `;
 
-export { getUsers, getUser, getStatsByUserId };
+const getWatchedVideos = `
+  query GetWatched($userId: String!) {
+    stats(where: {watched: {_eq: true}, userId: {_eq: $userId}}) {
+      videoId
+      imgUrl
+    }
+  }
+`;
+
+const getUserList = `
+query GetUserList($userId: String!) {
+  stats(where: {userId: {_eq: $userId}, favourited: {_eq: 1}}) {
+    id
+    imgUrl
+    userId
+    videoId
+    watched
+  }
+}
+`;
+
+export { getUsers, getUser, getStatsByUserId, getWatchedVideos, getUserList };

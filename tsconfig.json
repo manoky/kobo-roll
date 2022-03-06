@@ -21,7 +21,8 @@
       "types/*": ["types/*"],
       "lib/*": ["lib/*"],
       "constants/*": ["constants/*"],
-      "graphql/*": ["graphql/*"]
+      "graphql/*": ["graphql/*"],
+      "utils/*": ["utils/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

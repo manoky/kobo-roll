@@ -9,6 +9,7 @@ interface CardProps {
   size?: keyof Size;
   first: boolean;
   last: boolean;
+  inList?: boolean;
 }
 
 interface Size {
@@ -25,6 +26,7 @@ const Card = ({
   size = "medium",
   first,
   last,
+  inList,
 }: CardProps) => {
   const [imgSrc, setImgSrc] = useState(imgUrl);
 
@@ -43,7 +45,7 @@ const Card = ({
     <div className={styles.container}>
       <motion.div
         className={cls(styles.imgMotionWrapper, classes[size])}
-        whileHover={{ scale: 1.1, left: first ? 15 : last ? -15 : -12 }}
+        whileHover={inList ? {} : { scale: 1.1, left: first ? 15 : last ? -15 : -12 }}
       >
         <Image
           src={imgSrc}

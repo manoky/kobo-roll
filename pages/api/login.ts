@@ -5,7 +5,7 @@ import { setTokenCookie } from "lib/cookie";
 
 import { createNewUser, fetchUser } from "lib/hasuraService";
 
-export const magic = new Magic(process.env.MAGIC_API_SECRET || "");
+const magic = new Magic(process.env.MAGIC_API_SECRET || "");
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -16,7 +16,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // await magic.token.validate(didToken);
       const metadata = await magic.users.getMetadataByToken(didToken);
       const token = createToken(metadata);
-      console.log(token);
 
       const { issuer, publicAddress } = metadata;
 

@@ -32,7 +32,7 @@ interface MoviesProps {
 }
 
 interface MovieProps {
-  backdrop_path: string;
+  poster_path: string;
   id: number;
   genres: Genre[];
   title: string;
