@@ -49,13 +49,14 @@ const Login: NextPage = () => {
           const { email: userEmail } = await magic.user.getMetadata();
 
           localStorage.setItem("email", userEmail ?? "");
+          if (didToken) {
+            const resp = await loginUser(didToken ?? "");
 
-          const resp = await loginUser(didToken ?? "");
-
-          if (resp.ok) {
-            router.push("/");
-          } else {
-            throw new Error("Error logging in");
+            if (resp.ok) {
+              router.push("/");
+            } else {
+              throw new Error("Error logging in");
+            }
           }
         } catch (err) {
           console.log(err);
