@@ -21,7 +21,6 @@ async function fetchGraphQL<Type>(operationsDoc: string, token: string, variable
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
-      //   "x-hasura-admin-secret": process.env.NEXT_PUBLIC_HASURA_SECRET || "",
     },
     body: JSON.stringify({
       query: operationsDoc,

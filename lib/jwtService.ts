@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { MagicUserMetadata } from "@magic-sdk/admin";
 import { JwtProps } from "types/general";
 

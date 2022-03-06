@@ -31,17 +31,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const { token } = req.cookies;
   const auth = verifyToken(token);
 
-  if (!auth) {
-    return {
-      props: {},
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-
-  const { stats } = await fetchUserList(auth.userId, token);
+  const { stats } = await fetchUserList(auth?.userId || "", token);
 
   return {
     props: { videos: stats },

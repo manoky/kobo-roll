@@ -20,10 +20,9 @@ const Login: NextPage = () => {
     if (magic) {
       try {
         const didToken = await magic.auth.loginWithMagicLink({ email });
-        const { email: userEmail, publicAddress } = await magic.user.getMetadata();
+        const { email: userEmail } = await magic.user.getMetadata();
 
         localStorage.setItem("email", userEmail ?? "");
-        localStorage.setItem("didToken", didToken ?? "");
 
         const resp = await loginUser(didToken ?? "");
 
@@ -34,6 +33,33 @@ const Login: NextPage = () => {
         }
       } catch (err) {
         console.log(err);
+      }
+    }
+  };
+
+  const onKeyPress = async (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      if (!email) {
+        setEmailError("Enter a valid email address");
+      }
+
+      if (magic) {
+        try {
+          const didToken = await magic.auth.loginWithMagicLink({ email });
+          const { email: userEmail } = await magic.user.getMetadata();
+
+          localStorage.setItem("email", userEmail ?? "");
+
+          const resp = await loginUser(didToken ?? "");
+
+          if (resp.ok) {
+            router.push("/");
+          } else {
+            throw new Error("Error logging in");
+          }
+        } catch (err) {
+          console.log(err);
+        }
       }
     }
   };
@@ -66,6 +92,7 @@ const Login: NextPage = () => {
             placeholder="Email address"
             className={styles.emailInput}
             onChange={handleChange}
+            onKeyPress={onKeyPress}
           />
           <p className={styles.userMessage}>{emailError}</p>
           <button onClick={onLogin} className={styles.loginBtn}>

@@ -3,11 +3,9 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { magic } from "lib/magicService";
 import styles from "./navbar.module.css";
-import { useRouter } from "next/router";
 import { logoutUser } from "lib/generalService";
 
 const NavBar = () => {
-  const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -30,7 +28,6 @@ const NavBar = () => {
 
       localStorage.removeItem("email");
       await logoutUser();
-      // router.push("/login");
     } catch (err) {
       console.log(err);
     }
