@@ -38,7 +38,7 @@ const NavBar = () => {
       <div className={styles.wrapper}>
         <Link href="/">
           <a className={styles.logoLink}>
-            <div className={styles.logoWrapper}>Logo</div>
+            <div className={styles.logoWrapper}>KOBO-ROLL</div>
           </a>
         </Link>
 
